@@ -1,6 +1,13 @@
 # cf2f
 c-language function call-tree
 
+## build
+```
+sudo apt install flex
+sudo apt install graphviz
+make
+```
+
 ## useage
 
 ```
