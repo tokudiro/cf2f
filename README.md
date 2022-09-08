@@ -4,9 +4,9 @@ c-language function call-tree
 ## useage
 
 ```
-echo graph{ > hoge.dot
+echo digraph{ > hoge.dot
 cf2f hoge.c | sort | uniq >> hoge.dot
 echo } >> hoge.dot
-dot -Tpng -ohoge.png hoge.dot
+fdp -Tpng -ohoge.png hoge.dot
 ```
 
