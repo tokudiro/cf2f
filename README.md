@@ -1,5 +1,8 @@
 # cf2f
-c-language function call-tree
+Generate function call-tree for C-language.
+
+cf2f analyzes C source code and generates a partial dot-format text (for Graphviz) representing function call relationships.
+This helps you visualize function call trees in your C programs.
 
 ## build
 ```
