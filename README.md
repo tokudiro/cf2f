@@ -37,8 +37,8 @@ digraph{
 "bar()" -> "baz()"
   "bar()"[color=red];
   "baz()"[color=red];
-	"foo()" -> "bar()"
-	"foo()"[color=red];
+  "foo()" -> "bar()"
+  "foo()"[color=red];
 }
 ```
 
