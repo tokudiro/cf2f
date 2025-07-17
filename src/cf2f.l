@@ -92,7 +92,6 @@ COMMENT (\/\/)
         if (SBuf_isExist(func_buf)) {
             if (inBraceCounter == 0) {
                 SBuf_setText(from_func, SBuf_getText(func_buf), SBuf_getLen(func_buf));
-                printf("\t\"%s()\"[color=red];\n", SBuf_getText(from_func));
             } else {
                 printf("\t\"%s()\" -> \"%s()\"\n", SBuf_getText(from_func), SBuf_getText(func_buf));
             }
@@ -128,6 +127,11 @@ COMMENT (\/\/)
     }
     ("}"|"%>")  {
         inBraceCounter--; SBuf_init(func_buf);
+        if (inBraceCounter == 0) {
+            if ( SBuf_getLen(from_func) ) {
+                printf("\t\"%s()\"[color=red];\n", SBuf_getText(from_func));
+            }
+        }
     }
     ","   { SBuf_init(func_buf); }
     ":"   { SBuf_init(func_buf); }
