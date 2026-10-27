@@ -35,5 +35,7 @@ cf2v : ./obj/cf2v.yy.c ./src/main.c ./src/SBuf.c -lfl
 	$(CC) -pedantic -o cf2v ./obj/cf2v.yy.c ./src/main.c ./src/SBuf.c -L/usr/lib -lfl -I./src -DUSE_TYPE_BUFFER
 
 .PHONY: test
-test : cf2v
+test : cf2f funclist cf2v
+	./tests/run.sh cf2f
+	./tests/run.sh funclist
 	./tests/run.sh cf2v
