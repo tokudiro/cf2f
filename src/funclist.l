@@ -6,8 +6,8 @@
 
 int inBraceCounter = 0;
 
-SBuf* func_buf;
-SBuf* from_func;
+SBuf* word_buffer;
+SBuf* caller_function;
 
 %}
 
@@ -39,118 +39,118 @@ COMMENT (\/\/)
 
 %%
 <INITIAL>{
-    {NUMBER} { SBuf_init(func_buf); }
+    {NUMBER} { SBuf_init(word_buffer); }
     {WSPACE} { }
-    {COMMENTS} { SBuf_init(func_buf); BEGIN(COMMENT_SA); }
-    {COMMENT}  { SBuf_init(func_buf); BEGIN(COMMENT_SS); }
-    \" { SBuf_init(func_buf); BEGIN(STRING_ST); }
-    \' { SBuf_init(func_buf); BEGIN(STRING_SS); }
+    {COMMENTS} { SBuf_init(word_buffer); BEGIN(COMMENT_SA); }
+    {COMMENT}  { SBuf_init(word_buffer); BEGIN(COMMENT_SS); }
+    \" { SBuf_init(word_buffer); BEGIN(STRING_ST); }
+    \' { SBuf_init(word_buffer); BEGIN(STRING_SS); }
     {PRICOMPILE} { BEGIN(PRICOMPILER); }
 
-    "auto"       { SBuf_init(func_buf); }
-    "_Bool"      { SBuf_init(func_buf); }
-    "break"      { SBuf_init(func_buf); }
-    "case"       { SBuf_init(func_buf); }
-    "char"       { SBuf_init(func_buf); }
-    "_Complex"   { SBuf_init(func_buf); }
-    "const"      { SBuf_init(func_buf); }
-    "continue"   { SBuf_init(func_buf); }
-    "default"    { SBuf_init(func_buf); }
-    "do"         { SBuf_init(func_buf); }
-    "double"     { SBuf_init(func_buf); }
-    "else"       { SBuf_init(func_buf); }
-    "enum"       { SBuf_init(func_buf); }
-    "extern"     { SBuf_init(func_buf); }
-    "float"      { SBuf_init(func_buf); }
-    "for"        { SBuf_init(func_buf); }
-    "goto"       { SBuf_init(func_buf); }
-    "if"         { SBuf_init(func_buf); }
-    "_Imaginary" { SBuf_init(func_buf); }
-    "inline"     { SBuf_init(func_buf); }
-    "int"        { SBuf_init(func_buf); }
-    "long"       { SBuf_init(func_buf); }
-    "register"   { SBuf_init(func_buf); }
-    "restrict"   { SBuf_init(func_buf); }
-    "return"     { SBuf_init(func_buf); }
-    "short"      { SBuf_init(func_buf); }
-    "signed"     { SBuf_init(func_buf); }
-    "sizeof"     { SBuf_init(func_buf); }
-    "static"     { SBuf_init(func_buf); }
-    "struct"     { SBuf_init(func_buf); }
-    "switch"     { SBuf_init(func_buf); }
-    "typedef"    { SBuf_init(func_buf); }
-    "union"      { SBuf_init(func_buf); }
-    "unsigned"   { SBuf_init(func_buf); }
-    "void"       { SBuf_init(func_buf); }
-    "volatile"   { SBuf_init(func_buf); }
-    "while"      { SBuf_init(func_buf); }
+    "auto"       { SBuf_init(word_buffer); }
+    "_Bool"      { SBuf_init(word_buffer); }
+    "break"      { SBuf_init(word_buffer); }
+    "case"       { SBuf_init(word_buffer); }
+    "char"       { SBuf_init(word_buffer); }
+    "_Complex"   { SBuf_init(word_buffer); }
+    "const"      { SBuf_init(word_buffer); }
+    "continue"   { SBuf_init(word_buffer); }
+    "default"    { SBuf_init(word_buffer); }
+    "do"         { SBuf_init(word_buffer); }
+    "double"     { SBuf_init(word_buffer); }
+    "else"       { SBuf_init(word_buffer); }
+    "enum"       { SBuf_init(word_buffer); }
+    "extern"     { SBuf_init(word_buffer); }
+    "float"      { SBuf_init(word_buffer); }
+    "for"        { SBuf_init(word_buffer); }
+    "goto"       { SBuf_init(word_buffer); }
+    "if"         { SBuf_init(word_buffer); }
+    "_Imaginary" { SBuf_init(word_buffer); }
+    "inline"     { SBuf_init(word_buffer); }
+    "int"        { SBuf_init(word_buffer); }
+    "long"       { SBuf_init(word_buffer); }
+    "register"   { SBuf_init(word_buffer); }
+    "restrict"   { SBuf_init(word_buffer); }
+    "return"     { SBuf_init(word_buffer); }
+    "short"      { SBuf_init(word_buffer); }
+    "signed"     { SBuf_init(word_buffer); }
+    "sizeof"     { SBuf_init(word_buffer); }
+    "static"     { SBuf_init(word_buffer); }
+    "struct"     { SBuf_init(word_buffer); }
+    "switch"     { SBuf_init(word_buffer); }
+    "typedef"    { SBuf_init(word_buffer); }
+    "union"      { SBuf_init(word_buffer); }
+    "unsigned"   { SBuf_init(word_buffer); }
+    "void"       { SBuf_init(word_buffer); }
+    "volatile"   { SBuf_init(word_buffer); }
+    "while"      { SBuf_init(word_buffer); }
 
     {WORD} {
-        SBuf_setText(func_buf, yytext, yyleng);
+        SBuf_setText(word_buffer, yytext, yyleng);
     }
     \(  {
-        if (SBuf_isExist(func_buf)) {
+        if (SBuf_isExist(word_buffer)) {
             if (inBraceCounter == 0) {
-                SBuf_setText(from_func, SBuf_getText(func_buf), SBuf_getLen(func_buf));
+                SBuf_setText(caller_function, SBuf_getText(word_buffer), SBuf_getLen(word_buffer));
             }
         }
-        SBuf_init(func_buf);
+        SBuf_init(word_buffer);
     }
 
-    "..." { SBuf_init(func_buf); }
-    ">>=" { SBuf_init(func_buf); }
-    "<<=" { SBuf_init(func_buf); }
-    "+="  { SBuf_init(func_buf); }
-    "-="  { SBuf_init(func_buf); }
-    "*="  { SBuf_init(func_buf); }
-    "/="  { SBuf_init(func_buf); }
-    "%="  { SBuf_init(func_buf); }
-    "&="  { SBuf_init(func_buf); }
-    "^="  { SBuf_init(func_buf); }
-    "|="  { SBuf_init(func_buf); }
-    ">>"  { SBuf_init(func_buf); }
-    "<<"  { SBuf_init(func_buf); }
-    "++"  { SBuf_init(func_buf); }
-    "--"  { SBuf_init(func_buf); }
-    "->"  { SBuf_init(func_buf); }
-    "&&"  { SBuf_init(func_buf); }
-    "||"  { SBuf_init(func_buf); }
-    "<="  { SBuf_init(func_buf); }
-    ">="  { SBuf_init(func_buf); }
-    "=="  { SBuf_init(func_buf); }
-    "!="  { SBuf_init(func_buf); }
-    ";"   { SBuf_init(func_buf); }
+    "..." { SBuf_init(word_buffer); }
+    ">>=" { SBuf_init(word_buffer); }
+    "<<=" { SBuf_init(word_buffer); }
+    "+="  { SBuf_init(word_buffer); }
+    "-="  { SBuf_init(word_buffer); }
+    "*="  { SBuf_init(word_buffer); }
+    "/="  { SBuf_init(word_buffer); }
+    "%="  { SBuf_init(word_buffer); }
+    "&="  { SBuf_init(word_buffer); }
+    "^="  { SBuf_init(word_buffer); }
+    "|="  { SBuf_init(word_buffer); }
+    ">>"  { SBuf_init(word_buffer); }
+    "<<"  { SBuf_init(word_buffer); }
+    "++"  { SBuf_init(word_buffer); }
+    "--"  { SBuf_init(word_buffer); }
+    "->"  { SBuf_init(word_buffer); }
+    "&&"  { SBuf_init(word_buffer); }
+    "||"  { SBuf_init(word_buffer); }
+    "<="  { SBuf_init(word_buffer); }
+    ">="  { SBuf_init(word_buffer); }
+    "=="  { SBuf_init(word_buffer); }
+    "!="  { SBuf_init(word_buffer); }
+    ";"   { SBuf_init(word_buffer); }
     ("{"|"<%")  {
-        inBraceCounter++; SBuf_init(func_buf);
+        inBraceCounter++; SBuf_init(word_buffer);
     }
     ("}"|"%>")  {
-        inBraceCounter--; SBuf_init(func_buf);
+        inBraceCounter--; SBuf_init(word_buffer);
         if (inBraceCounter == 0) {
-            if ( SBuf_getLen(from_func) ) {
-                printf("%s\n", SBuf_getText(from_func));
+            if ( SBuf_getLen(caller_function) ) {
+                printf("%s\n", SBuf_getText(caller_function));
             }
         }
     }
-    ","   { SBuf_init(func_buf); }
-    ":"   { SBuf_init(func_buf); }
-    "="   { SBuf_init(func_buf); }
-    ")"   { SBuf_init(func_buf); }
-    ("["|"<:")  { SBuf_init(func_buf); }
-    ("]"|":>")  { SBuf_init(func_buf); }
-    "."   { SBuf_init(func_buf); }
-    "&"   { SBuf_init(func_buf); }
-    "!"   { SBuf_init(func_buf); }
-    "~"   { SBuf_init(func_buf); }
-    "-"   { SBuf_init(func_buf); }
-    "+"   { SBuf_init(func_buf); }
-    "*"   { SBuf_init(func_buf); }
-    "/"   { SBuf_init(func_buf); }
-    "%"   { SBuf_init(func_buf); }
-    "<"   { SBuf_init(func_buf); }
-    ">"   { SBuf_init(func_buf); }
-    "^"   { SBuf_init(func_buf); }
-    "|"   { SBuf_init(func_buf); }
-    "?"   { SBuf_init(func_buf); }
+    ","   { SBuf_init(word_buffer); }
+    ":"   { SBuf_init(word_buffer); }
+    "="   { SBuf_init(word_buffer); }
+    ")"   { SBuf_init(word_buffer); }
+    ("["|"<:")  { SBuf_init(word_buffer); }
+    ("]"|":>")  { SBuf_init(word_buffer); }
+    "."   { SBuf_init(word_buffer); }
+    "&"   { SBuf_init(word_buffer); }
+    "!"   { SBuf_init(word_buffer); }
+    "~"   { SBuf_init(word_buffer); }
+    "-"   { SBuf_init(word_buffer); }
+    "+"   { SBuf_init(word_buffer); }
+    "*"   { SBuf_init(word_buffer); }
+    "/"   { SBuf_init(word_buffer); }
+    "%"   { SBuf_init(word_buffer); }
+    "<"   { SBuf_init(word_buffer); }
+    ">"   { SBuf_init(word_buffer); }
+    "^"   { SBuf_init(word_buffer); }
+    "|"   { SBuf_init(word_buffer); }
+    "?"   { SBuf_init(word_buffer); }
 
     \n { }
     .  { }
