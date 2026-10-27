@@ -55,3 +55,4 @@ dkms.conf
 /funclist
 obj
 /cf2v
+!/tests/**/*.out

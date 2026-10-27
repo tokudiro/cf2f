@@ -1,0 +1,2 @@
+	"f()" -> "struct anon"
+	"f()"[color=red];

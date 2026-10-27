@@ -1,0 +1,3 @@
+	"f()" -> "struct S s"
+	"f()" -> "struct S* ps"
+	"f()"[color=red];

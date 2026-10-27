@@ -1,0 +1,4 @@
+	"f()" -> "int a"
+	"f()" -> "int b"
+	"f()" -> "char* p"
+	"f()"[color=red];

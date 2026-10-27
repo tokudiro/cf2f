@@ -1,0 +1,6 @@
+	"foo()" -> "bar()"
+	"foo()" -> "baz()"
+	"foo()"[color=red];
+	"bar()" -> "baz()"
+	"bar()"[color=red];
+	"baz()"[color=red];

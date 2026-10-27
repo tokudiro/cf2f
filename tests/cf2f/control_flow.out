@@ -1,0 +1,9 @@
+	"main()" -> "helper()"
+	"main()" -> "cond()"
+	"main()" -> "step()"
+	"main()" -> "work()"
+	"main()" -> "compute()"
+	"main()" -> "other()"
+	"main()"[color=red];
+	"helper()" -> "printf()"
+	"helper()"[color=red];

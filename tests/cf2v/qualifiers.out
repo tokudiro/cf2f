@@ -1,0 +1,3 @@
+	"f()" -> "unsigned int u"
+	"f()" -> "const char* c"
+	"f()"[color=red];

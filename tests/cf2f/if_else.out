@@ -1,0 +1,3 @@
+	"outer()" -> "inner1()"
+	"outer()" -> "inner2()"
+	"outer()"[color=red];
