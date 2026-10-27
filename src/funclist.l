@@ -60,7 +60,7 @@ COMMENT (\/\/)
     "do"         { SBuf_init(word_buffer); }
     "double"     { SBuf_init(word_buffer); }
     "else"       { SBuf_init(word_buffer); }
-    "enum"       { SBuf_init(word_buffer); }
+    "enum"       { top_aggregate_keyword(inBraceCounter); SBuf_init(word_buffer); }
     "extern"     { SBuf_init(word_buffer); }
     "float"      { SBuf_init(word_buffer); }
     "for"        { SBuf_init(word_buffer); }
@@ -77,10 +77,10 @@ COMMENT (\/\/)
     "signed"     { SBuf_init(word_buffer); }
     "sizeof"     { SBuf_init(word_buffer); }
     "static"     { SBuf_init(word_buffer); }
-    "struct"     { SBuf_init(word_buffer); }
+    "struct"     { top_aggregate_keyword(inBraceCounter); SBuf_init(word_buffer); }
     "switch"     { SBuf_init(word_buffer); }
     "typedef"    { SBuf_init(word_buffer); }
-    "union"      { SBuf_init(word_buffer); }
+    "union"      { top_aggregate_keyword(inBraceCounter); SBuf_init(word_buffer); }
     "unsigned"   { SBuf_init(word_buffer); }
     "void"       { SBuf_init(word_buffer); }
     "volatile"   { SBuf_init(word_buffer); }
@@ -120,22 +120,22 @@ COMMENT (\/\/)
     ">="  { SBuf_init(word_buffer); }
     "=="  { SBuf_init(word_buffer); }
     "!="  { SBuf_init(word_buffer); }
-    ";"   { SBuf_init(word_buffer); }
+    ";"   { top_semicolon(inBraceCounter); SBuf_init(word_buffer); }
     ("{"|"<%")  {
-        inBraceCounter++; SBuf_init(word_buffer);
+        top_open_brace(inBraceCounter); inBraceCounter++; SBuf_init(word_buffer);
     }
     ("}"|"%>")  {
         int was_open = inBraceCounter > 0; if (was_open) inBraceCounter--; SBuf_init(word_buffer);
         if (was_open && inBraceCounter == 0) {
-            if ( SBuf_getLen(caller_function) ) {
+            if ( top_close_brace_is_function() && SBuf_getLen(caller_function) ) {
                 printf("%s\n", SBuf_getText(caller_function));
             }
         }
     }
     ","   { SBuf_init(word_buffer); }
     ":"   { SBuf_init(word_buffer); }
-    "="   { SBuf_init(word_buffer); }
-    ")"   { SBuf_init(word_buffer); }
+    "="   { top_assign_op(inBraceCounter); SBuf_init(word_buffer); }
+    ")"   { top_close_paren(inBraceCounter); SBuf_init(word_buffer); }
     ("["|"<:")  { SBuf_init(word_buffer); }
     ("]"|":>")  { SBuf_init(word_buffer); }
     "."   { SBuf_init(word_buffer); }

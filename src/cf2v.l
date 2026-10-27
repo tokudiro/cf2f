@@ -76,6 +76,9 @@ COMMENT (\/\/)
     }
 
     "char"|"double"|"float"|"int"|"long"|"short"|"signed"|"unsigned"|"void"|"_Bool"|"_Complex"|"struct"|"union"|"enum"|"const"|"volatile"|"restrict"|"static"|"extern"|"register"|"auto"|"inline" {
+        if (strcmp(yytext, "struct") == 0 || strcmp(yytext, "union") == 0 || strcmp(yytext, "enum") == 0) {
+            top_aggregate_keyword(inBraceCounter);
+        }
         if (inBraceCounter > 0 && !in_expression_mode) {
             SBuf_append(type_buffer, yytext, yyleng);
         }
@@ -117,10 +120,12 @@ COMMENT (\/\/)
     }
 
     ")" {
+        top_close_paren(inBraceCounter);
         SBuf_init(word_buffer);
     }
 
     "{"|"<%" {
+        top_open_brace(inBraceCounter);
         inBraceCounter++;
         clear_all();
     }
@@ -129,13 +134,14 @@ COMMENT (\/\/)
         int was_open = inBraceCounter > 0; if (was_open) inBraceCounter--;
         clear_all();
         if (was_open && inBraceCounter == 0) {
-            if (SBuf_getLen(caller_function)) {
+            if (top_close_brace_is_function() && SBuf_getLen(caller_function)) {
                 printf("\t\"%s()\"[color=red];\n", SBuf_getText(caller_function));
             }
         }
     }
 
     "=" {
+        top_assign_op(inBraceCounter);
         if (inBraceCounter > 0 && !in_expression_mode) {
             if (SBuf_getLen(type_buffer) > 0 && SBuf_getLen(word_buffer) > 0) {
                 printf("\t\"%s()\" -> \"%s %s\"\n", SBuf_getText(caller_function), SBuf_getText(type_buffer), SBuf_getText(word_buffer));
@@ -156,6 +162,7 @@ COMMENT (\/\/)
     }
 
     ";" {
+        top_semicolon(inBraceCounter);
         if (inBraceCounter > 0 && !in_expression_mode) {
             if (SBuf_getLen(type_buffer) > 0 && SBuf_getLen(word_buffer) > 0) {
                 printf("\t\"%s()\" -> \"%s %s\"\n", SBuf_getText(caller_function), SBuf_getText(type_buffer), SBuf_getText(word_buffer));

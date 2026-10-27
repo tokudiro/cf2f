@@ -32,4 +32,32 @@ static void brace_depth_directive(const char* text, int* depth)
     }
 }
 
+/*
+ * Tell function bodies from other top-level brace blocks (struct/union/enum
+ * definitions, "= { ... }" initializers), so that only a function body prints
+ * the caller_function when its closing '}' is reached.
+ */
+static int top_aggregate = 0;   /* struct/union/enum seen in this top-level declaration */
+static int top_assign = 0;      /* '=' seen in this top-level declaration */
+static int top_is_function = 0; /* the open top-level block is a function body */
+
+static void top_aggregate_keyword(int depth) { if (depth == 0) top_aggregate = 1; }
+static void top_close_paren(int depth) { if (depth == 0) top_aggregate = 0; }
+static void top_assign_op(int depth) { if (depth == 0) top_assign = 1; }
+static void top_semicolon(int depth) { if (depth == 0) top_aggregate = top_assign = 0; }
+
+/* Call before incrementing the depth on '{'. */
+static void top_open_brace(int depth)
+{
+    if (depth == 0) top_is_function = !(top_aggregate || top_assign);
+}
+
+/* Call when '}' brings the depth back to 0; returns 1 for a function body. */
+static int top_close_brace_is_function(void)
+{
+    int r = top_is_function;
+    top_aggregate = top_assign = top_is_function = 0;
+    return r;
+}
+
 #endif // BRACE_DEPTH_H

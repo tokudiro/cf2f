@@ -1,0 +1,7 @@
+	"f()" -> "g()"
+	"f()"[color=red];
+	"make()"[color=red];
+	"h()" -> "k()"
+	"h()"[color=red];
+	"z()" -> "w()"
+	"z()"[color=red];
