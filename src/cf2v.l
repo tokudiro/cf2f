@@ -187,6 +187,7 @@ COMMENT (\/\/)
 }
 
 <PRICOMPILER>{
+    \\\r?\n { }
     \n { BEGIN(INITIAL); }
     . { }
 }
