@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "SBuf.h"
+#include "brace_depth.h"
 #include "SBuf_define.h"
 
 int inBraceCounter = 0;
@@ -67,7 +68,7 @@ COMMENT (\/\/)
     {COMMENT}  { SBuf_init(word_buffer); BEGIN(COMMENT_SS); }
     \" { SBuf_init(word_buffer); BEGIN(STRING_ST); }
     \' { SBuf_init(word_buffer); BEGIN(STRING_SS); }
-    {PRICOMPILE} { BEGIN(PRICOMPILER); }
+    {PRICOMPILE} { brace_depth_directive(yytext, &inBraceCounter); BEGIN(PRICOMPILER); }
 
     "break"|"case"|"continue"|"default"|"do"|"else"|"for"|"goto"|"if"|"return"|"switch"|"while"|"sizeof"|"typedef" {
         clear_all();
@@ -125,9 +126,9 @@ COMMENT (\/\/)
     }
 
     "}"|"%>" {
-        inBraceCounter--;
+        int was_open = inBraceCounter > 0; if (was_open) inBraceCounter--;
         clear_all();
-        if (inBraceCounter == 0) {
+        if (was_open && inBraceCounter == 0) {
             if (SBuf_getLen(caller_function)) {
                 printf("\t\"%s()\"[color=red];\n", SBuf_getText(caller_function));
             }
