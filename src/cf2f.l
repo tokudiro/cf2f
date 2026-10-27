@@ -171,6 +171,7 @@ COMMENT (\/\/)
 }
 
 <COMMENT_SS>{
+    \\\r?\n { }
     \n { BEGIN(INITIAL); }
     . { }
 }
