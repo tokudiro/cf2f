@@ -51,7 +51,7 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-cf2f
-funclist
+/cf2f
+/funclist
 obj
-cf2v
+/cf2v
