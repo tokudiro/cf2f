@@ -48,7 +48,7 @@ digraph{
 
 ## other tools
 
-`make` builds three tools. All of them read a C source file given as the first argument and print the result to stdout.
+`make` builds three tools. All of them read a C source file given as the first argument (standard input if omitted) and print the result to stdout. If the file cannot be opened, they print an error to stderr and exit with status 1.
 
 | tool | output |
 |---|---|

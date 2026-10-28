@@ -29,13 +29,15 @@ int main(int argc, char** argv)
     //SBuf_init(type_buffer);
 #endif // USE_TYPE_BUFFER
 
+    yyin = stdin;
     if(argc > 1) {
         yyin = fopen(argv[1], "r");
+        if(yyin == NULL) {
+            perror(argv[1]);
+            return 1;
+        }
     }
 
-    if ( yyin != 0) {
-        return yylex();
-    }
-    return 0;
+    return yylex();
 }
 
