@@ -77,3 +77,19 @@ void bar() {}
 Only the source file is read, so a name is "non-local" simply because no declaration of it was found in the function. Macros, enum constants and variables from headers are therefore treated alike; names in ALL_CAPS are skipped as macros, and member names after `.` or `->` are not reported. A function name passed without a call (`qsort(a, n, s, cmp)`) is reported as a variable.
 
 Like cf2f, the output is a partial dot-format text, so wrap it with `digraph{` and `}` as shown above.
+
+## excluding functions
+
+cf2f has no exclusion option. Filter its output with `grep -v -F -f`, as with `sort | uniq`:
+
+```sh
+cf2f hoge.c | grep -v -F -f exclude/stdc.txt | sort | uniq
+```
+
+Several lists can be combined by repeating `-f`:
+
+```sh
+cf2f hoge.c | grep -v -F -f exclude/stdc.txt -f exclude/posix.txt | sort | uniq
+```
+
+[exclude/stdc.txt](exclude/stdc.txt) lists the functions of the C standard library (`printf`, `malloc`, `strlen`, ...), and [exclude/posix.txt](exclude/posix.txt) those of POSIX that are not in it (`open`, `read`, `socket`, `pthread_*`, ...), as `-> "name()"` lines, so only calls to them are removed. Copy it and edit it to add your own functions or to remove ones you want to keep. A function of your own that has the same name as a listed one is excluded too.

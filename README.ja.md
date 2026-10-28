@@ -77,3 +77,19 @@ void bar() {}
 読むのはソースファイルだけなので、「関数の中に宣言が見つからない」ことだけを根拠に局所外と判断します。そのため、マクロ、enum の定数、ヘッダの変数は区別されません。すべて大文字の名前はマクロとみなして出力せず、`.` や `->` の後ろのメンバ名も出力しません。呼び出しなしで渡した関数名(`qsort(a, n, s, cmp)` の `cmp`)は、変数として出力されます。
 
 cf2f と同様に出力は部分的な dot 形式なので、上の例のように `digraph{` と `}` で囲んでください。
+
+## 関数を除外する
+
+cf2f に除外のオプションはありません。`sort | uniq` と同じように、出力を `grep -v -F -f` で絞り込みます。
+
+```sh
+cf2f hoge.c | grep -v -F -f exclude/stdc.txt | sort | uniq
+```
+
+複数の一覧は、`-f` を繰り返して組み合わせられます。
+
+```sh
+cf2f hoge.c | grep -v -F -f exclude/stdc.txt -f exclude/posix.txt | sort | uniq
+```
+
+[exclude/stdc.txt](exclude/stdc.txt) は C 標準ライブラリの関数(`printf`、`malloc`、`strlen` など)を、[exclude/posix.txt](exclude/posix.txt) はそれ以外の POSIX の関数(`open`、`read`、`socket`、`pthread_*` など)を、`-> "名前()"` の形で並べたものです。呼び出し先として出てくる行だけが消えます。コピーして、自分の関数を足したり、残したいものを消したりして使ってください。一覧にある名前と同じ名前の自作関数も、除外されます。
