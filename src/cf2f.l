@@ -93,9 +93,12 @@ COMMENT (\/\/)
         if (SBuf_isExist(word_buffer)) {
             if (inBraceCounter == 0) {
                 SBuf_setText(caller_function, SBuf_getText(word_buffer), SBuf_getLen(word_buffer));
-            } else {
+            }
+#ifndef FUNCLIST
+            else {
                 printf("\t\"%s()\" -> \"%s()\"\n", SBuf_getText(caller_function), SBuf_getText(word_buffer));
             }
+#endif // FUNCLIST
         }
         SBuf_init(word_buffer);
     }
@@ -131,7 +134,11 @@ COMMENT (\/\/)
         int was_open = inBraceCounter > 0; if (was_open) inBraceCounter--; SBuf_init(word_buffer);
         if (was_open && inBraceCounter == 0) {
             if ( top_close_brace_is_function() && SBuf_getLen(caller_function) ) {
+#ifdef FUNCLIST
+                printf("%s\n", SBuf_getText(caller_function));
+#else
                 printf("\t\"%s()\"[color=red];\n", SBuf_getText(caller_function));
+#endif // FUNCLIST
             }
         }
     }

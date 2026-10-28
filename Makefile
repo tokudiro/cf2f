@@ -4,7 +4,7 @@ all : cf2f funclist cf2v
 .PHONY: clean
 clean :
 	$(RM) cf2f ./obj/cf2f.yy.c
-	$(RM) funclist ./obj/funclist.yy.c
+	$(RM) funclist
 	$(RM) cf2v ./obj/cf2v.yy.c
 
 ./obj/cf2f.yy.c : ./src/cf2f.l
@@ -12,12 +12,6 @@ clean :
 		mkdir obj; \
 	fi
 	$(LEX) -o./obj/cf2f.yy.c ./src/cf2f.l
-
-./obj/funclist.yy.c : ./src/funclist.l
-	@if [ ! -d obj ]; then \
-		mkdir obj; \
-	fi
-	$(LEX) -o./obj/funclist.yy.c ./src/funclist.l
 
 ./obj/cf2v.yy.c : ./src/cf2v.l
 	@if [ ! -d obj ]; then \
@@ -28,8 +22,8 @@ clean :
 cf2f : ./obj/cf2f.yy.c ./src/main.c ./src/SBuf.c -lfl
 	$(CC) -pedantic -o cf2f ./obj/cf2f.yy.c ./src/main.c ./src/SBuf.c -L/usr/lib -lfl -I./src
 
-funclist : ./obj/funclist.yy.c ./src/main.c ./src/SBuf.c -lfl
-	$(CC) -pedantic -o funclist ./obj/funclist.yy.c ./src/main.c ./src/SBuf.c -L/usr/lib -lfl -I./src
+funclist : ./obj/cf2f.yy.c ./src/main.c ./src/SBuf.c -lfl
+	$(CC) -pedantic -o funclist ./obj/cf2f.yy.c ./src/main.c ./src/SBuf.c -L/usr/lib -lfl -I./src -DFUNCLIST
 
 cf2v : ./obj/cf2v.yy.c ./src/main.c ./src/SBuf.c -lfl
 	$(CC) -pedantic -o cf2v ./obj/cf2v.yy.c ./src/main.c ./src/SBuf.c -L/usr/lib -lfl -I./src -DUSE_TYPE_BUFFER
