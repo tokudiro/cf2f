@@ -1,0 +1,11 @@
+	"f()" -> "int m"
+	"f()" -> "int k"
+	"f()" -> "char buf"
+	"f()" -> "int v"
+	"f()" -> "struct S s"
+	"f()" -> "struct S* ps"
+	"f()" -> "enum e"
+	"f()" -> "MyType cb"
+	"f()" -> "const char* names"
+	"f()" -> "int fp"
+	"f()"[color=red];
