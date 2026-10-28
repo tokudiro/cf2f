@@ -46,6 +46,19 @@ digraph{
 
 <img width="184" height="173" alt="hoge" src="https://github.com/user-attachments/assets/fc9537f6-b479-4241-9331-22d912b2a0d4" />
 
+## cf2dot
+
+`bin/cf2dot` は、上の手順(cf2f の実行、重複行の除去、`digraph{` と `}` の追加)をまとめたシェルスクリプトです。
+
+```sh
+bin/cf2dot hoge.c > hoge.dot
+bin/cf2dot -x stdc -x posix a.c b.c > all.dot    # 標準関数と POSIX の関数を除外
+cat a.c b.c | bin/cf2dot -T svg > all.svg        # 標準入力から読み、dot を通す
+```
+
+- `-x 一覧`: 一覧にある関数の呼び出しを除外します(`stdc`、`posix`、または自分の一覧のパス。[関数を除外する](#関数を除外する) を参照)。繰り返せます。
+- `-T 形式`: 結果を Graphviz の `dot -T 形式` に通します。
+
 ## その他のツール
 
 `make` で3つのツールがビルドされます。いずれも第1引数の C ソースファイル(省略時は標準入力)を読み、結果を標準出力に出力します。ファイルを開けない場合は標準エラー出力にメッセージを出し、終了コード 1 で終わります。

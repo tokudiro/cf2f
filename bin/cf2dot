@@ -1,0 +1,45 @@
+#!/bin/sh
+# Usage: bin/cf2dot [-x list]... [-T format] [file.c...]
+# Prints the call graph of the given C files (standard input if none) as a
+# complete dot graph: runs cf2f, drops excluded functions, removes duplicate
+# lines, and wraps the result in "digraph{ }".
+#   -x list    leave out calls to the functions in list: "stdc", "posix",
+#              or the path of a file of  -> "name()"  lines (see exclude/).
+#              May be repeated.
+#   -T format  pipe the graph through Graphviz dot (e.g. -T svg, -T png).
+root=$(cd "$(dirname "$0")/.." && pwd) || exit 2
+cf2f=$root/cf2f
+[ -x "$cf2f" ] || { echo "cf2dot: $cf2f not built (run make)" >&2; exit 2; }
+
+excl=
+format=
+while getopts x:T:h opt; do
+    case $opt in
+        x)  case $OPTARG in
+                stdc|posix) list=$root/exclude/$OPTARG.txt ;;
+                *)          list=$OPTARG ;;
+            esac
+            [ -r "$list" ] || { echo "cf2dot: cannot read $list" >&2; exit 2; }
+            excl="$excl -f $list" ;;
+        T)  format=$OPTARG ;;
+        *)  sed -n '2,11s/^# \{0,1\}//p' "$0"; [ "$opt" = h ] && exit 0; exit 2 ;;
+    esac
+done
+shift $((OPTIND - 1))
+for f in "$@"; do
+    [ -r "$f" ] || { echo "cf2dot: cannot read $f" >&2; exit 2; }
+done
+
+graph() {
+    echo 'digraph{'
+    if [ $# -eq 0 ]; then "$cf2f"; else for f in "$@"; do "$cf2f" "$f"; done; fi |
+        if [ -n "$excl" ]; then grep -v -F $excl; else cat; fi | sort -u
+    echo '}'
+}
+
+if [ -n "$format" ]; then
+    command -v dot > /dev/null || { echo "cf2dot: dot (Graphviz) not installed" >&2; exit 2; }
+    graph "$@" | dot -T"$format"
+else
+    graph "$@"
+fi

@@ -46,6 +46,19 @@ digraph{
 
 <img width="184" height="173" alt="hoge" src="https://github.com/user-attachments/assets/fc9537f6-b479-4241-9331-22d912b2a0d4" />
 
+## cf2dot
+
+`bin/cf2dot` wraps the steps above: it runs cf2f, removes duplicate lines, and adds `digraph{` and `}`.
+
+```sh
+bin/cf2dot hoge.c > hoge.dot
+bin/cf2dot -x stdc -x posix a.c b.c > all.dot    # leave out standard and POSIX functions
+cat a.c b.c | bin/cf2dot -T svg > all.svg        # standard input; pipe through dot
+```
+
+- `-x list`: leave out calls to the functions in `list` (`stdc`, `posix`, or the path of your own list; see [excluding functions](#excluding-functions)). May be repeated.
+- `-T format`: pass the graph through Graphviz `dot -T format`.
+
 ## other tools
 
 `make` builds three tools. All of them read a C source file given as the first argument (standard input if omitted) and print the result to stdout. If the file cannot be opened, they print an error to stderr and exit with status 1.
