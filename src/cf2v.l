@@ -324,6 +324,7 @@ static void control_keyword(const char* text) {
 }
 
 static void type_keyword(const char* text, int len) {
+    if (strcmp(text, "extern") == 0) top_extern_keyword(inBraceCounter);
     if (strcmp(text, "struct") == 0 || strcmp(text, "union") == 0 || strcmp(text, "enum") == 0) {
         top_aggregate_keyword(inBraceCounter);
         if (in_declaration()) decl_aggregate = 1;
@@ -387,7 +388,7 @@ static void paren_open(void) {
 %}
 
 NONZERO [1-9]
-ALPHABET [a-zA-Z]
+ALPHABET [a-zA-Z_]
 MOJI     [a-zA-Z_0-9]
 COMMENTS (\/\*)
 COMMENTE (\*\/)
@@ -419,7 +420,7 @@ COMMENT (\/\/)
     {WSPACE} { }
     {COMMENTS} { SBuf_init(word_buffer); BEGIN(COMMENT_SA); }
     {COMMENT}  { SBuf_init(word_buffer); BEGIN(COMMENT_SS); }
-    \" { SBuf_init(word_buffer); BEGIN(STRING_ST); }
+    \" { top_string_start(inBraceCounter); SBuf_init(word_buffer); BEGIN(STRING_ST); }
     \' { SBuf_init(word_buffer); BEGIN(STRING_SS); }
     {PRICOMPILE} { brace_depth_directive(yytext, &inBraceCounter); BEGIN(PRICOMPILER); }
 
@@ -505,9 +506,10 @@ COMMENT (\/\/)
         } else {
             int was_top_level = inBraceCounter == 0;
             if (in_function_body(inBraceCounter)) flush_pending();
-            top_open_brace(inBraceCounter);
-            inBraceCounter++;
-            scope_open(was_top_level);
+            if (!top_open_brace(inBraceCounter)) {
+                inBraceCounter++;
+                scope_open(was_top_level);
+            }
             clear_all();
         }
     }

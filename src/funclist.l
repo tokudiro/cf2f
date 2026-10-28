@@ -13,7 +13,7 @@ SBuf* caller_function;
 %}
 
 NONZERO [1-9]
-ALPHABET [a-zA-Z]
+ALPHABET [a-zA-Z_]
 MOJI     [a-zA-Z_0-9]
 COMMENTS (\/\*)
 COMMENTE (\*\/)
@@ -44,7 +44,7 @@ COMMENT (\/\/)
     {WSPACE} { }
     {COMMENTS} { SBuf_init(word_buffer); BEGIN(COMMENT_SA); }
     {COMMENT}  { SBuf_init(word_buffer); BEGIN(COMMENT_SS); }
-    \" { SBuf_init(word_buffer); BEGIN(STRING_ST); }
+    \" { top_string_start(inBraceCounter); SBuf_init(word_buffer); BEGIN(STRING_ST); }
     \' { SBuf_init(word_buffer); BEGIN(STRING_SS); }
     {PRICOMPILE} { brace_depth_directive(yytext, &inBraceCounter); BEGIN(PRICOMPILER); }
 
@@ -61,7 +61,7 @@ COMMENT (\/\/)
     "double"     { SBuf_init(word_buffer); }
     "else"       { SBuf_init(word_buffer); }
     "enum"       { top_aggregate_keyword(inBraceCounter); SBuf_init(word_buffer); }
-    "extern"     { SBuf_init(word_buffer); }
+    "extern"     { top_extern_keyword(inBraceCounter); SBuf_init(word_buffer); }
     "float"      { SBuf_init(word_buffer); }
     "for"        { SBuf_init(word_buffer); }
     "goto"       { SBuf_init(word_buffer); }
@@ -122,7 +122,8 @@ COMMENT (\/\/)
     "!="  { SBuf_init(word_buffer); }
     ";"   { top_semicolon(inBraceCounter); SBuf_init(word_buffer); }
     ("{"|"<%")  {
-        top_open_brace(inBraceCounter); inBraceCounter++; SBuf_init(word_buffer);
+        if (!top_open_brace(inBraceCounter)) inBraceCounter++;
+        SBuf_init(word_buffer);
     }
     ("}"|"%>")  {
         int was_open = inBraceCounter > 0; if (was_open) inBraceCounter--; SBuf_init(word_buffer);
