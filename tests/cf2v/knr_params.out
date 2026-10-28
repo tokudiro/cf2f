@@ -1,0 +1,4 @@
+	"f()" -> "g1"
+	"f()"[color=red];
+	"h()" -> "g2"
+	"h()"[color=red];

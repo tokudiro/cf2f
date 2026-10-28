@@ -165,6 +165,7 @@ static int pending_count = 0;
 static int after_member = 0;   /* previous token was '.' or '->' */
 static int skip_next_word = 0; /* previous token was 'goto' */
 static int for_pending = 0;    /* previous token was 'for' */
+static int head_closed = 0;    /* top level: a '(...)' was just read; K&R parameter declarations may follow */
 
 static void add_name(char (*list)[NAME_MAX_LEN], int* count, const char* name) {
     if (*count >= NAMES_MAX || strlen(name) >= NAME_MAX_LEN) return;
@@ -241,6 +242,14 @@ static void scope_open(int was_top_level) {
         for (i = 0; i < param_count; i++) add_name(scope_names, &scope_count, param_names[i]);
     }
     param_count = 0;
+    head_closed = 0;
+}
+
+/* K&R style:  void f(a, b) int a; char *b; { ... }  -- the declared name is a parameter. */
+static void knr_param(void) {
+    if (head_closed && SBuf_getLen(word_buffer) > 0) {
+        add_name(param_names, &param_count, SBuf_getText(word_buffer));
+    }
 }
 
 /* Call before the depth is decremented. */
@@ -366,6 +375,7 @@ static void paren_open(void) {
         clear_all();
         scan_params();
         top_close_paren(0);
+        head_closed = 1;
     } else {
         clear_all();
         /* "for (int i = 0; ...": the init clause may declare a variable */
@@ -524,6 +534,7 @@ COMMENT (\/\/)
     }
 
     "," {
+        if (inBraceCounter == 0) knr_param();
         if (in_function_body(inBraceCounter) && !in_expression_mode) {
             commit_declaration();
         }
@@ -537,7 +548,8 @@ COMMENT (\/\/)
             commit_declaration();
         }
         if (in_function_body(inBraceCounter)) flush_pending();
-        else param_count = 0;
+        else if (head_closed && SBuf_getLen(word_buffer) > 0) knr_param();
+        else { param_count = 0; head_closed = 0; }
         clear_all();
     }
 
@@ -560,7 +572,7 @@ COMMENT (\/\/)
     }
 
     "["|"<:" {
-        if (in_declaration() && SBuf_getLen(word_buffer) > 0) {
+        if ((in_declaration() || (inBraceCounter == 0 && head_closed)) && SBuf_getLen(word_buffer) > 0) {
             skip_balanced('[', ']');
         } else {
             SBuf_init(word_buffer);
