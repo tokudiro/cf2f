@@ -52,6 +52,9 @@ static void top_open_brace(int depth)
     if (depth == 0) top_is_function = !(top_aggregate || top_assign);
 }
 
+/* Inside a function body (not in a struct/union/enum definition or initializer). */
+static int in_function_body(int depth) { return depth > 0 && top_is_function; }
+
 /* Call when '}' brings the depth back to 0; returns 1 for a function body. */
 static int top_close_brace_is_function(void)
 {

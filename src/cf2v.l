@@ -79,13 +79,13 @@ COMMENT (\/\/)
         if (strcmp(yytext, "struct") == 0 || strcmp(yytext, "union") == 0 || strcmp(yytext, "enum") == 0) {
             top_aggregate_keyword(inBraceCounter);
         }
-        if (inBraceCounter > 0 && !in_expression_mode) {
+        if (in_function_body(inBraceCounter) && !in_expression_mode) {
             SBuf_append(type_buffer, yytext, yyleng);
         }
     }
 
     "*" {
-        if (inBraceCounter > 0 && !in_expression_mode) {
+        if (in_function_body(inBraceCounter) && !in_expression_mode) {
             if (SBuf_getLen(word_buffer) > 0) {
                 SBuf_append(type_buffer, SBuf_getText(word_buffer), SBuf_getLen(word_buffer));
                 SBuf_init(word_buffer);
@@ -95,7 +95,7 @@ COMMENT (\/\/)
     }
 
     {WORD} {
-        if (inBraceCounter > 0) {
+        if (in_function_body(inBraceCounter)) {
             if (!in_expression_mode) {
                 if (SBuf_getLen(word_buffer) > 0) {
                     SBuf_append(type_buffer, SBuf_getText(word_buffer), SBuf_getLen(word_buffer));
@@ -142,7 +142,7 @@ COMMENT (\/\/)
 
     "=" {
         top_assign_op(inBraceCounter);
-        if (inBraceCounter > 0 && !in_expression_mode) {
+        if (in_function_body(inBraceCounter) && !in_expression_mode) {
             if (SBuf_getLen(type_buffer) > 0 && SBuf_getLen(word_buffer) > 0) {
                 printf("\t\"%s()\" -> \"%s %s\"\n", SBuf_getText(caller_function), SBuf_getText(type_buffer), SBuf_getText(word_buffer));
             }
@@ -152,7 +152,7 @@ COMMENT (\/\/)
     }
 
     "," {
-        if (inBraceCounter > 0 && !in_expression_mode) {
+        if (in_function_body(inBraceCounter) && !in_expression_mode) {
             if (SBuf_getLen(type_buffer) > 0 && SBuf_getLen(word_buffer) > 0) {
                 printf("\t\"%s()\" -> \"%s %s\"\n", SBuf_getText(caller_function), SBuf_getText(type_buffer), SBuf_getText(word_buffer));
             }
@@ -163,7 +163,7 @@ COMMENT (\/\/)
 
     ";" {
         top_semicolon(inBraceCounter);
-        if (inBraceCounter > 0 && !in_expression_mode) {
+        if (in_function_body(inBraceCounter) && !in_expression_mode) {
             if (SBuf_getLen(type_buffer) > 0 && SBuf_getLen(word_buffer) > 0) {
                 printf("\t\"%s()\" -> \"%s %s\"\n", SBuf_getText(caller_function), SBuf_getText(type_buffer), SBuf_getText(word_buffer));
             }
