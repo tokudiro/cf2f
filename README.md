@@ -54,23 +54,26 @@ digraph{
 |---|---|
 | `cf2f` | function call relationships (`"caller()" -> "callee()"`) |
 | `funclist` | list of function names |
-| `cf2v` | variables declared in each function (`"func()" -> "type name"`) |
+| `cf2v` | non-local variables used in each function (`"func()" -> "name"`) |
 
 ### cf2v
 
-For the same hoge.c as above with a local variable added:
+cf2v reports the variables a function uses that are not declared in it: neither its parameters nor its local variables. These are globals, or anything else defined outside the function.
 
 ```C
-void foo() { int b; bar(); }
+int counter;
+void foo(int a) { int b = a + counter; bar(); }
 void bar() {}
 ```
 
 `cf2v hoge.c` prints:
 
 ```
-	"foo()" -> "int b"
+	"foo()" -> "counter"
 	"foo()"[color=red];
 	"bar()"[color=red];
 ```
+
+Only the source file is read, so a name is "non-local" simply because no declaration of it was found in the function. Macros, enum constants and variables from headers are therefore treated alike; names in ALL_CAPS are skipped as macros, and member names after `.` or `->` are not reported. A function name passed without a call (`qsort(a, n, s, cmp)`) is reported as a variable.
 
 Like cf2f, the output is a partial dot-format text, so wrap it with `digraph{` and `}` as shown above.

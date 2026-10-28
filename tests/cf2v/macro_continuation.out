@@ -1,4 +1,2 @@
-	"f()" -> "int b"
 	"f()"[color=red];
-	"h()" -> "int d"
 	"h()"[color=red];
